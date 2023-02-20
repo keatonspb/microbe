@@ -10,18 +10,21 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func UpdatePlayer(ecs *ecs.ECS) {
-	settingEntry, ok := tag.Setting.First(ecs.World)
-	if !ok {
-		logrus.Error("setting not found")
-		return
-	}
-	settings := component.Setting.Get(settingEntry)
+type PlayerController struct {
+	screenWidth  float64
+	screenHeight float64
+}
 
-	if settings.Stop {
-		return
-	}
+func NewPlayerController(screenWidth, screenHeight float64) *PlayerController {
+	return &PlayerController{screenWidth: screenWidth, screenHeight: screenHeight}
+}
 
+func (c *PlayerController) Update(ecs *ecs.ECS) {
+	c.updatePlayer(ecs)
+	c.updatePlayerDamage(ecs)
+}
+
+func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 	player, ok := tag.Player.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")
@@ -40,7 +43,7 @@ func UpdatePlayer(ecs *ecs.ECS) {
 
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
 		object := collision.GetObject(player)
-		if object.Y+object.H < settings.MapHeight {
+		if object.Y+object.H < c.screenHeight {
 			object.Y += component.GetMove(player, ecs.Time.DeltaTime())
 		}
 		object.Update()
@@ -58,7 +61,7 @@ func UpdatePlayer(ecs *ecs.ECS) {
 
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		object := collision.GetObject(player)
-		if object.X+object.W < settings.MapWidth {
+		if object.X+object.W < c.screenWidth {
 			object.X += component.GetMove(player, ecs.Time.DeltaTime())
 		}
 		object.Update()
@@ -70,7 +73,7 @@ func UpdatePlayer(ecs *ecs.ECS) {
 	}
 }
 
-func UpdatePlayerDamage(ecs *ecs.ECS) {
+func (c *PlayerController) updatePlayerDamage(ecs *ecs.ECS) {
 	playerEntry, ok := tag.Player.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")
@@ -89,7 +92,11 @@ func UpdatePlayerDamage(ecs *ecs.ECS) {
 
 }
 
-func DrawPlayer(ecs *ecs.ECS, screen *ebiten.Image) {
+func (c *PlayerController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
+	c.drawPlayer(ecs, screen)
+}
+
+func (c *PlayerController) drawPlayer(ecs *ecs.ECS, screen *ebiten.Image) {
 	playerEntry, ok := tag.Player.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")

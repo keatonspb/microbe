@@ -1,6 +1,7 @@
 package factory
 
 import (
+	"embed"
 	"log"
 	"math/rand"
 
@@ -16,7 +17,7 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int) *donburi.Entry {
+func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int, fs *embed.FS) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Mob,
@@ -26,7 +27,7 @@ func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int) *donburi.Entry {
 		component.Float,
 	))
 	mobDesc := meta.Mobs[mobType]
-	img, _, err := ebitenutil.NewImageFromFile(mobDesc.ImagePath)
+	img, _, err := ebitenutil.NewImageFromFileSystem(fs, mobDesc.ImagePath)
 	if err != nil {
 		log.Fatal(err)
 	}

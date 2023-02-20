@@ -1,6 +1,7 @@
 package system
 
 import (
+	"embed"
 	"image"
 	"image/color"
 
@@ -25,10 +26,23 @@ type CellController struct {
 	space        *donburi.Entry
 	maxCells     int
 	inventory    *component.InventoryData
+	fs           *embed.FS
 }
 
-func NewCellController(screenWidth, screenHeight float64, space *donburi.Entry, maxCells int, inventory *component.InventoryData) *CellController {
-	return &CellController{screenWidth: screenWidth, screenHeight: screenHeight, space: space, maxCells: maxCells, inventory: inventory}
+func NewCellController(screenWidth, screenHeight float64,
+	space *donburi.Entry,
+	maxCells int,
+	inventory *component.InventoryData,
+	fs *embed.FS,
+) *CellController {
+	return &CellController{
+		screenWidth:  screenWidth,
+		screenHeight: screenHeight,
+		space:        space,
+		maxCells:     maxCells,
+		inventory:    inventory,
+		fs:           fs,
+	}
 }
 
 func (w *CellController) Update(ecs *ecs.ECS) {
@@ -57,7 +71,7 @@ func (w *CellController) generate(ecs *ecs.ECS) {
 	cell := factory.NewCell(ecs, meta.Point{
 		X: helper.RandFloat(w.screenWidth),
 		Y: 0,
-	})
+	}, w.fs)
 
 	collision.AddToSpace(w.space, cell)
 }

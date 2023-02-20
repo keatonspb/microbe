@@ -1,6 +1,7 @@
 package factory
 
 import (
+	"embed"
 	"log"
 
 	"bacteria/collision"
@@ -15,7 +16,7 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewCell(ecs *ecs.ECS, position meta.Point) *donburi.Entry {
+func NewCell(ecs *ecs.ECS, position meta.Point, fs *embed.FS) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Cell,
@@ -39,7 +40,7 @@ func NewCell(ecs *ecs.ECS, position meta.Point) *donburi.Entry {
 		Speed: 10,
 	})
 
-	img, _, err := ebitenutil.NewImageFromFile("assets/cell.png")
+	img, _, err := ebitenutil.NewImageFromFileSystem(fs, "assets/cell.png")
 	if err != nil {
 		log.Fatal(err)
 	}

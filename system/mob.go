@@ -1,6 +1,8 @@
 package system
 
 import (
+	"embed"
+
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
@@ -14,7 +16,22 @@ import (
 	"github.com/yohamta/donburi/filter"
 )
 
-func CollideMob(ecs *ecs.ECS) {
+type MobController struct {
+	fs *embed.FS
+}
+
+func NewMobController(fs *embed.FS) *MobController {
+	return &MobController{
+		fs: fs,
+	}
+}
+
+func (c *MobController) Update(ecs *ecs.ECS) {
+	c.generateMob(ecs)
+	c.collideMob(ecs)
+}
+
+func (c *MobController) collideMob(ecs *ecs.ECS) {
 	settingEntry, ok := tag.Setting.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")
@@ -49,7 +66,7 @@ func CollideMob(ecs *ecs.ECS) {
 	})
 }
 
-func GenerateMob(ecs *ecs.ECS) {
+func (c *MobController) generateMob(ecs *ecs.ECS) {
 	settingEntry, ok := tag.Setting.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")
@@ -67,13 +84,17 @@ func GenerateMob(ecs *ecs.ECS) {
 	query := donburi.NewQuery(filter.Contains(tag.Mob))
 
 	if query.Count(ecs.World) < settings.MaxMobs {
-		en := factory.NewMob(ecs, settings.MapWidth, meta.RandMobType())
+		en := factory.NewMob(ecs, settings.MapWidth, meta.RandMobType(), c.fs)
 		collision.AddToSpace(spaceEntry, en)
 	}
 
 }
 
-func DrawMob(ecs *ecs.ECS, screen *ebiten.Image) {
+func (c *MobController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
+	c.drawMob(ecs, screen)
+}
+
+func (c *MobController) drawMob(ecs *ecs.ECS, screen *ebiten.Image) {
 	tag.Mob.Each(ecs.World, func(e *donburi.Entry) {
 		object := component.CollideBox.Get(e)
 		sprite := component.Sprite.Get(e)

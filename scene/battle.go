@@ -1,6 +1,7 @@
 package scene
 
 import (
+	"embed"
 	"image/color"
 
 	"bacteria/collision"
@@ -21,12 +22,14 @@ type Battle struct {
 	screenWidth, screenHeight float64
 	weaponController          *system.WeaponController
 	floatingController        *system.FloatController
+	fs                        *embed.FS
 }
 
-func NewBattle(screenWidth, screenHeight float64) *Battle {
+func NewBattle(screenWidth, screenHeight float64, fs *embed.FS) *Battle {
 	s := &Battle{
 		screenWidth:  screenWidth,
 		screenHeight: screenHeight,
+		fs:           fs,
 	}
 
 	s.init()
@@ -37,29 +40,30 @@ func NewBattle(screenWidth, screenHeight float64) *Battle {
 func (s *Battle) init() {
 	s.ecs = ecs.NewECS(donburi.NewWorld())
 	space := factory.CreateSpace(s.ecs, s.screenWidth, s.screenHeight)
-
-	s.weaponController = system.NewWeaponController(s.screenWidth, s.screenHeight, space)
-	s.floatingController = system.NewFloatController(s.screenWidth, s.screenHeight, space)
-
-	pl := factory.NewPlayer(s.ecs, s.screenWidth, s.screenHeight)
+	pl := factory.NewPlayer(s.ecs, s.screenWidth, s.screenHeight, s.fs)
 	collision.AddToSpace(space, pl)
 	inv := component.Inventory.Get(pl)
 
-	cellController := system.NewCellController(s.screenWidth, s.screenHeight, space, 4, inv)
+	playerController := system.NewPlayerController(s.screenWidth, s.screenHeight)
+	s.ecs.AddSystem(playerController.Update)
+	s.ecs.AddRenderer(layer.Default, playerController.Draw)
 
-	s.ecs.AddSystem(system.UpdatePlayerDamage)
-	s.ecs.AddSystem(system.GenerateMob)
-	s.ecs.AddSystem(system.CollideMob)
+	s.weaponController = system.NewWeaponController(s.screenWidth, s.screenHeight, space)
 	s.ecs.AddSystem(s.weaponController.Update)
-	s.ecs.AddSystem(s.floatingController.Update)
-	s.ecs.AddSystem(cellController.Update)
-	s.ecs.AddSystem(system.UpdatePlayer)
-
-	s.ecs.AddRenderer(layer.Default, system.DrawMob)
-	s.ecs.AddRenderer(layer.Default, system.DrawStatus)
 	s.ecs.AddRenderer(layer.Default, s.weaponController.Draw)
+
+	s.floatingController = system.NewFloatController(s.screenWidth, s.screenHeight, space)
+	s.ecs.AddSystem(s.floatingController.Update)
+
+	mobController := system.NewMobController(s.fs)
+	s.ecs.AddSystem(mobController.Update)
+	s.ecs.AddRenderer(layer.Default, mobController.Draw)
+
+	cellController := system.NewCellController(s.screenWidth, s.screenHeight, space, 4, inv, s.fs)
+	s.ecs.AddSystem(cellController.Update)
 	s.ecs.AddRenderer(layer.Default, cellController.Draw)
-	s.ecs.AddRenderer(layer.Default, system.DrawPlayer)
+
+	s.ecs.AddRenderer(layer.Default, system.DrawStatus)
 
 	factory.NewSetting(s.ecs, s.screenWidth, s.screenHeight, 50)
 }
