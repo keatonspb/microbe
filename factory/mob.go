@@ -1,6 +1,7 @@
 package factory
 
 import (
+	"log"
 	"math/rand"
 
 	"bacteria/collision"
@@ -9,6 +10,7 @@ import (
 	"bacteria/meta"
 	"bacteria/tag"
 
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/solarlune/resolv"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -24,6 +26,15 @@ func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int) *donburi.Entry {
 		component.Float,
 	))
 	mobDesc := meta.Mobs[mobType]
+	img, _, err := ebitenutil.NewImageFromFile(mobDesc.ImagePath)
+	if err != nil {
+		log.Fatal(err)
+	}
+	component.Sprite.Set(entry, &component.SpriteData{
+		Height: 5,
+		Width:  5,
+		Image:  img,
+	})
 	component.Float.Set(entry, &component.FloatData{
 		Speed: mobDesc.Speed,
 	})

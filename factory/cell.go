@@ -1,7 +1,7 @@
 package factory
 
 import (
-	"image/color"
+	"log"
 
 	"bacteria/collision"
 	"bacteria/component"
@@ -9,6 +9,7 @@ import (
 	"bacteria/meta"
 	"bacteria/tag"
 
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/solarlune/resolv"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -38,15 +39,15 @@ func NewCell(ecs *ecs.ECS, position meta.Point) *donburi.Entry {
 		Speed: 10,
 	})
 
+	img, _, err := ebitenutil.NewImageFromFile("assets/cell.png")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	component.Sprite.Set(entry, &component.SpriteData{
-		Width:  30,
-		Height: 30,
-		Color: color.RGBA{
-			R: 217,
-			G: 230,
-			B: 125,
-			A: 255,
-		},
+		Width:  32,
+		Height: 32,
+		Image:  img,
 	})
 
 	collision.SetObject(entry, resolv.NewObject(position.X, position.Y, 30, 30, "cell"))

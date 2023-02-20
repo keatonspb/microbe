@@ -8,7 +8,6 @@ import (
 	"bacteria/tag"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/sirupsen/logrus"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -77,10 +76,13 @@ func GenerateMob(ecs *ecs.ECS) {
 func DrawMob(ecs *ecs.ECS, screen *ebiten.Image) {
 	tag.Mob.Each(ecs.World, func(e *donburi.Entry) {
 		object := component.CollideBox.Get(e)
+		sprite := component.Sprite.Get(e)
 		mob := component.Mob.Get(e)
 		if mob.Attack {
 			return
 		}
-		ebitenutil.DrawRect(screen, object.X, object.Y, object.H, object.W, meta.Mobs[mob.Type].Color)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(object.X, object.Y)
+		screen.DrawImage(sprite.Image, op)
 	})
 }

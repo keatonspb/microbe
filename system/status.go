@@ -27,5 +27,10 @@ func DrawStatus(ecs *ecs.ECS, screen *ebiten.Image) {
 		enemies++
 	})
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("Health: %0.0f\nAttackers: %d\nEnemies: %d\nCells collected: %d", health.Health, len(ph.Attackers), enemies, inv.Cells))
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("Health: %0.0f\n"+
+		"Attackers: %d\n"+
+		"Enemies: %d\n"+
+		"Cells collected: %d\n\n"+
+		"TPS: %0.2f\n"+
+		"FPS: %0.2f\n", health.Health, len(ph.Attackers), enemies, inv.Cells, ebiten.ActualTPS(), ebiten.ActualFPS()))
 }

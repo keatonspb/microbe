@@ -1,6 +1,7 @@
 package system
 
 import (
+	"image"
 	"image/color"
 
 	"bacteria/collision"
@@ -67,10 +68,14 @@ func (w *CellController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 		collisionData := component.CollideBox.Get(entry)
 		hp := component.Health.Get(entry)
 
-		ebitenutil.DrawRect(screen, collisionData.X, collisionData.Y, spriteData.Height, spriteData.Width, spriteData.Color)
+		sprite := component.Sprite.Get(entry)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(collisionData.X, collisionData.Y)
+
+		screen.DrawImage(sprite.Image.SubImage(image.Rect(0, 0, 32, 32)).(*ebiten.Image), op)
 
 		helthBarWidth := spriteData.Width * (hp.Health / hp.MaxHp)
-		ebitenutil.DrawRect(screen, collisionData.X, collisionData.Y+spriteData.Height+3, helthBarWidth, 5,
+		ebitenutil.DrawRect(screen, collisionData.X, collisionData.Y+spriteData.Height+3, helthBarWidth, 3,
 			color.RGBA{255, 0, 0, 255})
 
 	})
