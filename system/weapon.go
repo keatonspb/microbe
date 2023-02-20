@@ -36,22 +36,22 @@ func (w *WeaponController) Update(ecs *ecs.ECS) {
 
 func (w *WeaponController) collide(ecs *ecs.ECS) {
 	tag.Bullet.Each(ecs.World, func(e *donburi.Entry) {
-		obj := component.CollideBox.Get(e)
+		target := component.CollideBox.Get(e)
 
-		if coll := obj.Check(0, 0, "mob"); coll != nil {
+		if coll := target.Check(0, 0, "mob"); coll != nil {
 			collision.Remove(w.space, e)
 			ecs.World.Remove(e.Entity())
 			object := coll.Objects[0]
 
 			tag.Mob.Each(ecs.World, func(e *donburi.Entry) {
-				obj := component.CollideBox.Get(e)
-				if obj == object {
+				mobObj := component.CollideBox.Get(e)
+				if mobObj == object {
 					collision.Remove(w.space, e)
 					ecs.World.Remove(e.Entity())
 				}
 			})
 		}
-		if coll := obj.Check(0, 0, "cell"); coll != nil {
+		if coll := target.Check(0, 0, "cell"); coll != nil {
 			collision.Remove(w.space, e)
 			ecs.World.Remove(e.Entity())
 
@@ -82,8 +82,6 @@ func (w *WeaponController) updateShoot(ecs *ecs.ECS) {
 		w.shoot(ecs, weapon, meta.NewPoint(obj.X+obj.W/2-1, obj.Y+obj.H/2-1))
 	}
 }
-
-var reloadTime = time.Second
 
 func (w *WeaponController) shoot(ecs *ecs.ECS, weapon *component.WeaponData, start meta.Point) {
 	if weapon.NextShot.After(time.Now()) {
