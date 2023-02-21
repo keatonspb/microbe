@@ -1,22 +1,22 @@
 package factory
 
 import (
-	"embed"
 	"log"
 
+	"bacteria/assets"
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper/storage"
 	"bacteria/layer"
 	"bacteria/meta"
 	"bacteria/tag"
 
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/solarlune/resolv"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewCell(ecs *ecs.ECS, position meta.Point, fs *embed.FS) *donburi.Entry {
+func NewCell(ecs *ecs.ECS, position meta.Point, fs *storage.Storage) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Cell,
@@ -40,7 +40,7 @@ func NewCell(ecs *ecs.ECS, position meta.Point, fs *embed.FS) *donburi.Entry {
 		Speed: 10,
 	})
 
-	img, _, err := ebitenutil.NewImageFromFileSystem(fs, "assets/cell.png")
+	img, err := fs.GetImage(assets.ImageCell)
 	if err != nil {
 		log.Fatal(err)
 	}

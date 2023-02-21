@@ -1,7 +1,6 @@
 package system
 
 import (
-	"embed"
 	"image"
 	"image/color"
 
@@ -9,6 +8,7 @@ import (
 	"bacteria/component"
 	"bacteria/factory"
 	"bacteria/helper"
+	"bacteria/helper/storage"
 	"bacteria/meta"
 	"bacteria/tag"
 
@@ -26,14 +26,14 @@ type CellController struct {
 	space        *donburi.Entry
 	maxCells     int
 	inventory    *component.InventoryData
-	fs           *embed.FS
+	fs           *storage.Storage
 }
 
 func NewCellController(screenWidth, screenHeight float64,
 	space *donburi.Entry,
 	maxCells int,
 	inventory *component.InventoryData,
-	fs *embed.FS,
+	fs *storage.Storage,
 ) *CellController {
 	return &CellController{
 		screenWidth:  screenWidth,

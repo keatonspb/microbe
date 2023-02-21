@@ -3,6 +3,9 @@ package meta
 import (
 	"image/color"
 	"math/rand"
+
+	"bacteria/assets"
+	"bacteria/helper/storage"
 )
 
 const (
@@ -14,11 +17,11 @@ const (
 var availableMobTypes = []int{MobTypeA, MobTypeB, MobTypeC}
 
 type Mob struct {
-	Type      int
-	Color     color.Color
-	Speed     float64
-	Damage    float64 //per second
-	ImagePath string
+	Type       int
+	Color      color.Color
+	Speed      float64
+	Damage     float64 //per second
+	ImageAsset storage.AssetKey
 }
 
 var Mobs = map[int]Mob{
@@ -30,9 +33,9 @@ var Mobs = map[int]Mob{
 			B: 217,
 			A: 255,
 		},
-		Speed:     80,
-		Damage:    0.5,
-		ImagePath: "assets/ley1.png",
+		Speed:      80,
+		Damage:     0.5,
+		ImageAsset: assets.ImageMobA,
 	},
 	MobTypeB: {
 		Type: MobTypeB,
@@ -42,9 +45,9 @@ var Mobs = map[int]Mob{
 			B: 129,
 			A: 255,
 		},
-		Speed:     50,
-		Damage:    0.3,
-		ImagePath: "assets/ley2.png",
+		Speed:      50,
+		Damage:     0.3,
+		ImageAsset: assets.ImageMobB,
 	},
 	MobTypeC: {
 		Type: MobTypeC,
@@ -54,9 +57,9 @@ var Mobs = map[int]Mob{
 			B: 222,
 			A: 255,
 		},
-		Speed:     30,
-		Damage:    0.1,
-		ImagePath: "assets/ley3.png",
+		Speed:      30,
+		Damage:     0.1,
+		ImageAsset: assets.ImageMobC,
 	},
 }
 
