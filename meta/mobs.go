@@ -14,10 +14,11 @@ const (
 var availableMobTypes = []int{MobTypeA, MobTypeB, MobTypeC}
 
 type Mob struct {
-	Type   int
-	Color  color.Color
-	Speed  float64
-	Damage float64 //per second
+	Type      int
+	Color     color.Color
+	Speed     float64
+	Damage    float64 //per second
+	ImagePath string
 }
 
 var Mobs = map[int]Mob{
@@ -29,8 +30,9 @@ var Mobs = map[int]Mob{
 			B: 217,
 			A: 255,
 		},
-		Speed:  80,
-		Damage: 0.5,
+		Speed:     80,
+		Damage:    0.5,
+		ImagePath: "assets/ley1.png",
 	},
 	MobTypeB: {
 		Type: MobTypeB,
@@ -40,8 +42,9 @@ var Mobs = map[int]Mob{
 			B: 129,
 			A: 255,
 		},
-		Speed:  50,
-		Damage: 0.3,
+		Speed:     50,
+		Damage:    0.3,
+		ImagePath: "assets/ley2.png",
 	},
 	MobTypeC: {
 		Type: MobTypeC,
@@ -51,8 +54,9 @@ var Mobs = map[int]Mob{
 			B: 222,
 			A: 255,
 		},
-		Speed:  30,
-		Damage: 0.1,
+		Speed:     30,
+		Damage:    0.1,
+		ImagePath: "assets/ley3.png",
 	},
 }
 

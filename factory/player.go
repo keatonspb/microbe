@@ -1,6 +1,7 @@
 package factory
 
 import (
+	"embed"
 	"image/color"
 	"log"
 
@@ -15,7 +16,7 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64) *donburi.Entry {
+func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *embed.FS) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Player,
@@ -28,7 +29,7 @@ func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64) *donburi.Entry {
 		component.Inventory,
 	))
 
-	img, _, err := ebitenutil.NewImageFromFile("assets/player.png")
+	img, _, err := ebitenutil.NewImageFromFileSystem(fs, "assets/player.png")
 	if err != nil {
 		log.Fatal(err)
 	}

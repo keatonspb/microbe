@@ -1,6 +1,8 @@
 package system
 
 import (
+	"embed"
+
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
@@ -8,14 +10,28 @@ import (
 	"bacteria/tag"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/sirupsen/logrus"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 	"github.com/yohamta/donburi/filter"
 )
 
-func CollideMob(ecs *ecs.ECS) {
+type MobController struct {
+	fs *embed.FS
+}
+
+func NewMobController(fs *embed.FS) *MobController {
+	return &MobController{
+		fs: fs,
+	}
+}
+
+func (c *MobController) Update(ecs *ecs.ECS) {
+	c.generateMob(ecs)
+	c.collideMob(ecs)
+}
+
+func (c *MobController) collideMob(ecs *ecs.ECS) {
 	settingEntry, ok := tag.Setting.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")
@@ -50,7 +66,7 @@ func CollideMob(ecs *ecs.ECS) {
 	})
 }
 
-func GenerateMob(ecs *ecs.ECS) {
+func (c *MobController) generateMob(ecs *ecs.ECS) {
 	settingEntry, ok := tag.Setting.First(ecs.World)
 	if !ok {
 		logrus.Error("setting not found")
@@ -68,19 +84,26 @@ func GenerateMob(ecs *ecs.ECS) {
 	query := donburi.NewQuery(filter.Contains(tag.Mob))
 
 	if query.Count(ecs.World) < settings.MaxMobs {
-		en := factory.NewMob(ecs, settings.MapWidth, meta.RandMobType())
+		en := factory.NewMob(ecs, settings.MapWidth, meta.RandMobType(), c.fs)
 		collision.AddToSpace(spaceEntry, en)
 	}
 
 }
 
-func DrawMob(ecs *ecs.ECS, screen *ebiten.Image) {
+func (c *MobController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
+	c.drawMob(ecs, screen)
+}
+
+func (c *MobController) drawMob(ecs *ecs.ECS, screen *ebiten.Image) {
 	tag.Mob.Each(ecs.World, func(e *donburi.Entry) {
 		object := component.CollideBox.Get(e)
+		sprite := component.Sprite.Get(e)
 		mob := component.Mob.Get(e)
 		if mob.Attack {
 			return
 		}
-		ebitenutil.DrawRect(screen, object.X, object.Y, object.H, object.W, meta.Mobs[mob.Type].Color)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(object.X, object.Y)
+		screen.DrawImage(sprite.Image, op)
 	})
 }

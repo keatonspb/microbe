@@ -1,6 +1,8 @@
 package system
 
 import (
+	"embed"
+	"image"
 	"image/color"
 
 	"bacteria/collision"
@@ -24,10 +26,23 @@ type CellController struct {
 	space        *donburi.Entry
 	maxCells     int
 	inventory    *component.InventoryData
+	fs           *embed.FS
 }
 
-func NewCellController(screenWidth, screenHeight float64, space *donburi.Entry, maxCells int, inventory *component.InventoryData) *CellController {
-	return &CellController{screenWidth: screenWidth, screenHeight: screenHeight, space: space, maxCells: maxCells, inventory: inventory}
+func NewCellController(screenWidth, screenHeight float64,
+	space *donburi.Entry,
+	maxCells int,
+	inventory *component.InventoryData,
+	fs *embed.FS,
+) *CellController {
+	return &CellController{
+		screenWidth:  screenWidth,
+		screenHeight: screenHeight,
+		space:        space,
+		maxCells:     maxCells,
+		inventory:    inventory,
+		fs:           fs,
+	}
 }
 
 func (w *CellController) Update(ecs *ecs.ECS) {
@@ -56,7 +71,7 @@ func (w *CellController) generate(ecs *ecs.ECS) {
 	cell := factory.NewCell(ecs, meta.Point{
 		X: helper.RandFloat(w.screenWidth),
 		Y: 0,
-	})
+	}, w.fs)
 
 	collision.AddToSpace(w.space, cell)
 }
@@ -67,10 +82,14 @@ func (w *CellController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 		collisionData := component.CollideBox.Get(entry)
 		hp := component.Health.Get(entry)
 
-		ebitenutil.DrawRect(screen, collisionData.X, collisionData.Y, spriteData.Height, spriteData.Width, spriteData.Color)
+		sprite := component.Sprite.Get(entry)
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(collisionData.X, collisionData.Y)
+
+		screen.DrawImage(sprite.Image.SubImage(image.Rect(0, 0, 32, 32)).(*ebiten.Image), op)
 
 		helthBarWidth := spriteData.Width * (hp.Health / hp.MaxHp)
-		ebitenutil.DrawRect(screen, collisionData.X, collisionData.Y+spriteData.Height+3, helthBarWidth, 5,
+		ebitenutil.DrawRect(screen, collisionData.X, collisionData.Y+spriteData.Height+3, helthBarWidth, 3,
 			color.RGBA{255, 0, 0, 255})
 
 	})
