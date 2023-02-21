@@ -1,11 +1,10 @@
 package system
 
 import (
-	"embed"
-
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
+	"bacteria/helper/storage"
 	"bacteria/meta"
 	"bacteria/tag"
 
@@ -17,10 +16,10 @@ import (
 )
 
 type MobController struct {
-	fs *embed.FS
+	fs *storage.Storage
 }
 
-func NewMobController(fs *embed.FS) *MobController {
+func NewMobController(fs *storage.Storage) *MobController {
 	return &MobController{
 		fs: fs,
 	}

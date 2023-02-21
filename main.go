@@ -2,8 +2,10 @@ package main
 
 import (
 	"embed"
+	"io"
 	"log"
 
+	"bacteria/helper/storage"
 	"bacteria/scene"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -37,8 +39,17 @@ func (g *Game) Layout(_, _ int) (int, int) {
 func main() {
 	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Bacteria")
+
+	fs := storage.NewStorage(func(path string) io.ReadCloser {
+		f, err := gameAssets.Open(path)
+		if err != nil {
+			log.Fatal(err)
+		}
+		return f
+	})
+
 	if err := ebiten.RunGame(&Game{
-		scene: scene.NewBattle(screenWidth, screenHeight, &gameAssets),
+		scene: scene.NewBattle(screenWidth, screenHeight, fs),
 	}); err != nil {
 		log.Fatal(err)
 	}

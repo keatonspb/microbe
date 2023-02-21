@@ -1,12 +1,13 @@
 package scene
 
 import (
-	"embed"
 	"image/color"
 
+	"bacteria/assets"
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
+	"bacteria/helper/storage"
 	"bacteria/layer"
 	"bacteria/system"
 
@@ -22,10 +23,10 @@ type Battle struct {
 	screenWidth, screenHeight float64
 	weaponController          *system.WeaponController
 	floatingController        *system.FloatController
-	fs                        *embed.FS
+	fs                        *storage.Storage
 }
 
-func NewBattle(screenWidth, screenHeight float64, fs *embed.FS) *Battle {
+func NewBattle(screenWidth, screenHeight float64, fs *storage.Storage) *Battle {
 	s := &Battle{
 		screenWidth:  screenWidth,
 		screenHeight: screenHeight,
@@ -39,7 +40,10 @@ func NewBattle(screenWidth, screenHeight float64, fs *embed.FS) *Battle {
 
 func (s *Battle) init() {
 	s.ecs = ecs.NewECS(donburi.NewWorld())
+	s.fs.RegisterAssets(assets.ImagePaths)
+
 	space := factory.CreateSpace(s.ecs, s.screenWidth, s.screenHeight)
+
 	pl := factory.NewPlayer(s.ecs, s.screenWidth, s.screenHeight, s.fs)
 	collision.AddToSpace(space, pl)
 	inv := component.Inventory.Get(pl)

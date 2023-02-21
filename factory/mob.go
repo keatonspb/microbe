@@ -1,23 +1,22 @@
 package factory
 
 import (
-	"embed"
 	"log"
 	"math/rand"
 
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper/storage"
 	"bacteria/layer"
 	"bacteria/meta"
 	"bacteria/tag"
 
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/solarlune/resolv"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int, fs *embed.FS) *donburi.Entry {
+func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int, fs *storage.Storage) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Mob,
@@ -27,7 +26,7 @@ func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int, fs *embed.FS) *donbu
 		component.Float,
 	))
 	mobDesc := meta.Mobs[mobType]
-	img, _, err := ebitenutil.NewImageFromFileSystem(fs, mobDesc.ImagePath)
+	img, err := fs.GetImage(mobDesc.ImageAsset)
 	if err != nil {
 		log.Fatal(err)
 	}

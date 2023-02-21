@@ -6,7 +6,7 @@ require (
 	github.com/hajimehoshi/ebiten/v2 v2.4.16
 	github.com/sirupsen/logrus v1.8.1
 	github.com/solarlune/resolv v0.6.0
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.8.1
 	github.com/yohamta/donburi v1.3.3
 )
 
@@ -22,5 +22,5 @@ require (
 	golang.org/x/image v0.1.0 // indirect
 	golang.org/x/mobile v0.0.0-20221012134814-c746ac228303 // indirect
 	golang.org/x/sys v0.0.0-20221013171732-95e765b1cc43 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
+	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

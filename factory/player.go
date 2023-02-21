@@ -1,22 +1,22 @@
 package factory
 
 import (
-	"embed"
 	"image/color"
 	"log"
 
+	"bacteria/assets"
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper/storage"
 	"bacteria/layer"
 	"bacteria/tag"
 
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/solarlune/resolv"
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *embed.FS) *donburi.Entry {
+func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *storage.Storage) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Player,
@@ -29,7 +29,7 @@ func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *embed.FS) *d
 		component.Inventory,
 	))
 
-	img, _, err := ebitenutil.NewImageFromFileSystem(fs, "assets/player.png")
+	img, err := fs.GetImage(assets.ImagePlayer)
 	if err != nil {
 		log.Fatal(err)
 	}
