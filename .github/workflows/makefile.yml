@@ -22,8 +22,8 @@ jobs:
     - name: Deps
       run: go mod vendor
 
-    - name: Build
-      run: go build -v ./...
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
 
     - name: Test
       run: go test -v ./...
