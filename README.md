@@ -1,4 +1,6 @@
-Microbe
+# Microbe video game
+
+[![Lint and Test](https://github.com/keatonspb/microbe/actions/workflows/makefile.yml/badge.svg)](https://github.com/keatonspb/microbe/actions/workflows/makefile.yml)
 
 Game about living as a microbe in human body.
 
