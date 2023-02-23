@@ -8,7 +8,6 @@ import (
 	"bacteria/component"
 	"bacteria/factory"
 	"bacteria/helper"
-	"bacteria/helper/storage"
 	"bacteria/meta"
 	"bacteria/tag"
 
@@ -21,27 +20,22 @@ import (
 )
 
 type CellController struct {
-	screenWidth  float64
-	screenHeight float64
-	space        *donburi.Entry
-	maxCells     int
-	inventory    *component.InventoryData
-	fs           *storage.Storage
+	gameCtx   *helper.Context
+	space     *donburi.Entry
+	maxCells  int
+	inventory *component.InventoryData
 }
 
-func NewCellController(screenWidth, screenHeight float64,
+func NewCellController(ctx *helper.Context,
 	space *donburi.Entry,
 	maxCells int,
 	inventory *component.InventoryData,
-	fs *storage.Storage,
 ) *CellController {
 	return &CellController{
-		screenWidth:  screenWidth,
-		screenHeight: screenHeight,
-		space:        space,
-		maxCells:     maxCells,
-		inventory:    inventory,
-		fs:           fs,
+		gameCtx:   ctx,
+		space:     space,
+		maxCells:  maxCells,
+		inventory: inventory,
 	}
 }
 
@@ -69,9 +63,9 @@ func (w *CellController) generate(ecs *ecs.ECS) {
 	}
 
 	cell := factory.NewCell(ecs, meta.Point{
-		X: helper.RandFloat(w.screenWidth),
+		X: helper.RandFloat(w.gameCtx.ScreenWidth()),
 		Y: 0,
-	}, w.fs)
+	}, w.gameCtx.Storage)
 
 	collision.AddToSpace(w.space, cell)
 }

@@ -1,13 +1,14 @@
 package scene
 
 import (
+	"fmt"
 	"image/color"
 
 	"bacteria/assets"
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
-	"bacteria/helper/storage"
+	"bacteria/helper"
 	"bacteria/layer"
 	"bacteria/system"
 
@@ -19,62 +20,75 @@ import (
 
 // Battle main battle scene
 type Battle struct {
-	ecs                       *ecs.ECS
-	screenWidth, screenHeight float64
-	weaponController          *system.WeaponController
-	floatingController        *system.FloatController
-	fs                        *storage.Storage
+	ecs                *ecs.ECS
+	weaponController   *system.WeaponController
+	floatingController *system.FloatController
+	gameContext        *helper.Context
 }
 
-func NewBattle(screenWidth, screenHeight float64, fs *storage.Storage) *Battle {
+func NewBattle(ctx *helper.Context) (*Battle, error) {
 	s := &Battle{
-		screenWidth:  screenWidth,
-		screenHeight: screenHeight,
-		fs:           fs,
+		gameContext: ctx,
 	}
 
-	s.init()
+	err := s.init()
+	if err != nil {
+		return nil, fmt.Errorf("failed to init battle scene: %w", err)
+	}
 
-	return s
+	return s, nil
 }
 
-func (s *Battle) init() {
+func (s *Battle) init() error {
 	s.ecs = ecs.NewECS(donburi.NewWorld())
-	s.fs.RegisterAssets(assets.ImagePaths)
+	s.gameContext.Storage.RegisterAssets(assets.ImagePaths)
 
-	space := factory.CreateSpace(s.ecs, s.screenWidth, s.screenHeight)
+	space := factory.CreateSpace(s.gameContext, s.ecs)
 
-	pl := factory.NewPlayer(s.ecs, s.screenWidth, s.screenHeight, s.fs)
+	pl := factory.NewPlayer(s.gameContext, s.ecs)
 	collision.AddToSpace(space, pl)
 	inv := component.Inventory.Get(pl)
 
-	playerController := system.NewPlayerController(s.screenWidth, s.screenHeight)
+	playerController := system.NewPlayerController(s.gameContext)
 	s.ecs.AddSystem(playerController.Update)
 	s.ecs.AddRenderer(layer.Default, playerController.Draw)
 
-	s.weaponController = system.NewWeaponController(s.screenWidth, s.screenHeight, space)
+	wc, err := system.NewWeaponController(s.gameContext, space)
+	if err != nil {
+		return fmt.Errorf("failed to create weapon controller: %w", err)
+	}
+	s.weaponController = wc
+
 	s.ecs.AddSystem(s.weaponController.Update)
 	s.ecs.AddRenderer(layer.Default, s.weaponController.Draw)
 
-	s.floatingController = system.NewFloatController(s.screenWidth, s.screenHeight, space)
+	s.floatingController = system.NewFloatController(s.gameContext, space)
 	s.ecs.AddSystem(s.floatingController.Update)
 
-	mobController := system.NewMobController(s.fs)
+	mobController, err := system.NewMobController(s.gameContext)
+	if err != nil {
+		return fmt.Errorf("failed to create mob controller: %w", err)
+	}
+
 	s.ecs.AddSystem(mobController.Update)
 	s.ecs.AddRenderer(layer.Default, mobController.Draw)
 
-	cellController := system.NewCellController(s.screenWidth, s.screenHeight, space, 4, inv, s.fs)
+	cellController := system.NewCellController(s.gameContext, space, 4, inv)
 	s.ecs.AddSystem(cellController.Update)
 	s.ecs.AddRenderer(layer.Default, cellController.Draw)
 
 	s.ecs.AddRenderer(layer.Default, system.DrawStatus)
 
-	factory.NewSetting(s.ecs, s.screenWidth, s.screenHeight, 50)
+	factory.NewSetting(s.ecs, s.gameContext.ScreenWidth(), s.gameContext.ScreenHeight(), 50)
+	return nil
 }
 
 func (s *Battle) Update() {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-		s.init()
+		err := s.init()
+		if err != nil {
+			panic(err)
+		}
 		return
 	}
 	s.ecs.Update()

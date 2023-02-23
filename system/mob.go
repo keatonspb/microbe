@@ -1,10 +1,13 @@
 package system
 
 import (
+	"fmt"
+
+	"bacteria/assets/audio"
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
-	"bacteria/helper/storage"
+	"bacteria/helper"
 	"bacteria/meta"
 	"bacteria/tag"
 
@@ -16,13 +19,17 @@ import (
 )
 
 type MobController struct {
-	fs *storage.Storage
+	gameCtx *helper.Context
 }
 
-func NewMobController(fs *storage.Storage) *MobController {
-	return &MobController{
-		fs: fs,
+func NewMobController(ctx *helper.Context) (*MobController, error) {
+	err := ctx.Audio.AddSoundFromPath(audio.NeitrofillAttack, "assets/audio/neitrofil_attack.wav")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create sound player: %w", err)
 	}
+	return &MobController{
+		gameCtx: ctx,
+	}, nil
 }
 
 func (c *MobController) Update(ecs *ecs.ECS) {
@@ -60,6 +67,7 @@ func (c *MobController) collideMob(ecs *ecs.ECS) {
 					ph.AddAttacker(mob)
 					mob.Attack = true
 				}
+				c.gameCtx.Audio.PlaySound(audio.NeitrofillAttack)
 			})
 		}
 	})
@@ -83,7 +91,7 @@ func (c *MobController) generateMob(ecs *ecs.ECS) {
 	query := donburi.NewQuery(filter.Contains(tag.Mob))
 
 	if query.Count(ecs.World) < settings.MaxMobs {
-		en := factory.NewMob(ecs, settings.MapWidth, meta.RandMobType(), c.fs)
+		en := factory.NewMob(ecs, settings.MapWidth, meta.RandMobType(), c.gameCtx.Storage)
 		collision.AddToSpace(spaceEntry, en)
 	}
 

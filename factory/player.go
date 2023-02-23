@@ -7,7 +7,7 @@ import (
 	"bacteria/assets"
 	"bacteria/collision"
 	"bacteria/component"
-	"bacteria/helper/storage"
+	"bacteria/helper"
 	"bacteria/layer"
 	"bacteria/tag"
 
@@ -16,7 +16,7 @@ import (
 	"github.com/yohamta/donburi/ecs"
 )
 
-func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *storage.Storage) *donburi.Entry {
+func NewPlayer(ctx *helper.Context, ecs *ecs.ECS) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layer.Default,
 		tag.Player,
@@ -29,7 +29,7 @@ func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *storage.Stor
 		component.Inventory,
 	))
 
-	img, err := fs.GetImage(assets.ImagePlayer)
+	img, err := ctx.Storage.GetImage(assets.ImagePlayer)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -51,7 +51,7 @@ func NewPlayer(ecs *ecs.ECS, screenWidth, screenHeight float64, fs *storage.Stor
 	}
 	component.Health.SetValue(entry, hd)
 
-	collisionObj := resolv.NewObject(screenWidth/2, screenHeight/2, playerHeight, playerWidth, "player")
+	collisionObj := resolv.NewObject(ctx.ScreenWidth()/2, ctx.ScreenHeight()/2, playerHeight, playerWidth, "player")
 	collision.SetObject(entry, collisionObj)
 
 	component.Velocity.Set(entry, component.NewVelocity(5, 200, 300))

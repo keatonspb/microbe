@@ -3,6 +3,7 @@ package system
 import (
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper"
 
 	"github.com/yohamta/donburi"
 	"github.com/yohamta/donburi/ecs"
@@ -11,13 +12,12 @@ import (
 )
 
 type FloatController struct {
-	screenWidth  float64
-	screenHeight float64
-	space        *donburi.Entry
+	gameCtx *helper.Context
+	space   *donburi.Entry
 }
 
-func NewFloatController(screenWidth, screenHeight float64, space *donburi.Entry) *FloatController {
-	return &FloatController{screenWidth: screenWidth, screenHeight: screenHeight, space: space}
+func NewFloatController(ctx *helper.Context, space *donburi.Entry) *FloatController {
+	return &FloatController{gameCtx: ctx, space: space}
 }
 
 func (w *FloatController) Update(ecs *ecs.ECS) {
@@ -30,7 +30,7 @@ func (w *FloatController) Update(ecs *ecs.ECS) {
 		collisionData.X = collisionData.X + dx
 		collisionData.Y = collisionData.Y + dy
 
-		if collisionData.Y > w.screenHeight || collisionData.X > w.screenWidth {
+		if collisionData.Y > w.gameCtx.ScreenHeight() || collisionData.X > w.gameCtx.ScreenWidth() {
 			collision.Remove(w.space, entry)
 			ecs.World.Remove(entry.Entity())
 			return

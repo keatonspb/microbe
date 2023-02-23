@@ -3,6 +3,7 @@ package system
 import (
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper"
 	"bacteria/tag"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,12 +12,11 @@ import (
 )
 
 type PlayerController struct {
-	screenWidth  float64
-	screenHeight float64
+	gameCtx *helper.Context
 }
 
-func NewPlayerController(screenWidth, screenHeight float64) *PlayerController {
-	return &PlayerController{screenWidth: screenWidth, screenHeight: screenHeight}
+func NewPlayerController(ctx *helper.Context) *PlayerController {
+	return &PlayerController{gameCtx: ctx}
 }
 
 func (c *PlayerController) Update(ecs *ecs.ECS) {
@@ -43,7 +43,7 @@ func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 
 	if ebiten.IsKeyPressed(ebiten.KeyDown) {
 		object := collision.GetObject(player)
-		if object.Y+object.H < c.screenHeight {
+		if object.Y+object.H < c.gameCtx.ScreenHeight() {
 			object.Y += component.GetMove(player, ecs.Time.DeltaTime())
 		}
 		object.Update()
@@ -61,7 +61,7 @@ func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 
 	if ebiten.IsKeyPressed(ebiten.KeyRight) {
 		object := collision.GetObject(player)
-		if object.X+object.W < c.screenWidth {
+		if object.X+object.W < c.gameCtx.ScreenWidth() {
 			object.X += component.GetMove(player, ecs.Time.DeltaTime())
 		}
 		object.Update()
