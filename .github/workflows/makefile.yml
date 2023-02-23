@@ -2,7 +2,7 @@ name: Lint
 
 on:
   push:
-    branches: [ "master", "10-fix-ci" ]
+    branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
 
@@ -32,6 +32,11 @@ jobs:
 
     - name: vendor
       run: go mod vendor
+
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v3
+      with:
+        version: v1.51.1
 
     - name: Build
       run: go build -v ./...
