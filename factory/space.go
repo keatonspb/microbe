@@ -2,6 +2,7 @@ package factory
 
 import (
 	"bacteria/component"
+	"bacteria/helper"
 	"bacteria/tag"
 
 	"github.com/solarlune/resolv"
@@ -10,14 +11,14 @@ import (
 	"github.com/yohamta/donburi/examples/platformer/layers"
 )
 
-func CreateSpace(ecs *ecs.ECS, screenWidth, screenHeight float64) *donburi.Entry {
+func CreateSpace(ctx *helper.Context, ecs *ecs.ECS) *donburi.Entry {
 	entry := ecs.World.Entry(ecs.Create(
 		layers.Default,
 		tag.Space,
 		component.Space,
 	))
 
-	spaceData := resolv.NewSpace(int(screenWidth), int(screenHeight), 16, 16)
+	spaceData := resolv.NewSpace(int(ctx.ScreenWidth()), int(ctx.ScreenHeight()), 16, 16)
 	component.Space.Set(entry, spaceData)
 
 	return entry

@@ -5,10 +5,13 @@ import (
 	"io"
 	"log"
 
+	"bacteria/helper"
+	"bacteria/helper/sound"
 	"bacteria/helper/storage"
 	"bacteria/scene"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
 //go:embed assets
@@ -47,9 +50,24 @@ func main() {
 		}
 		return f
 	})
+	audioPlayer, err := sound.NewPlayer(audio.NewContext(44100), 44100)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gameContext := helper.NewContext()
+
+	gameContext.Audio = audioPlayer
+	gameContext.Storage = fs
+	gameContext.SetScreenSize(screenWidth, screenHeight)
+
+	battleScene, err := scene.NewBattle(gameContext)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	if err := ebiten.RunGame(&Game{
-		scene: scene.NewBattle(screenWidth, screenHeight, fs),
+		scene: battleScene,
 	}); err != nil {
 		log.Fatal(err)
 	}

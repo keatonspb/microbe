@@ -1,12 +1,15 @@
 package system
 
 import (
+	"fmt"
 	"math"
 	"time"
 
+	"bacteria/assets/audio"
 	"bacteria/collision"
 	"bacteria/component"
 	"bacteria/factory"
+	"bacteria/helper"
 	"bacteria/meta"
 	"bacteria/tag"
 
@@ -19,13 +22,24 @@ import (
 )
 
 type WeaponController struct {
-	screenWidth  float64
-	screenHeight float64
-	space        *donburi.Entry
+	gameCtx *helper.Context
+	space   *donburi.Entry
 }
 
-func NewWeaponController(screenWidth, screenHeight float64, space *donburi.Entry) *WeaponController {
-	return &WeaponController{screenWidth: screenWidth, screenHeight: screenHeight, space: space}
+func NewWeaponController(ctx *helper.Context, space *donburi.Entry) (*WeaponController, error) {
+	c := &WeaponController{gameCtx: ctx, space: space}
+
+	err := c.gameCtx.Audio.AddSoundFromPath(audio.Shoot, "assets/audio/shoot.wav")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create sound player: %w", err)
+	}
+
+	err = c.gameCtx.Audio.AddSoundFromPath(audio.Hit, "assets/audio/hit.wav")
+	if err != nil {
+		return nil, fmt.Errorf("failed to create sound player: %w", err)
+	}
+
+	return c, nil
 }
 
 func (w *WeaponController) Update(ecs *ecs.ECS) {
@@ -42,7 +56,7 @@ func (w *WeaponController) collide(ecs *ecs.ECS) {
 			collision.Remove(w.space, e)
 			ecs.World.Remove(e.Entity())
 			object := coll.Objects[0]
-
+			w.gameCtx.Audio.PlaySound(audio.Hit)
 			tag.Mob.Each(ecs.World, func(e *donburi.Entry) {
 				mobObj := component.CollideBox.Get(e)
 				if mobObj == object {
@@ -56,6 +70,7 @@ func (w *WeaponController) collide(ecs *ecs.ECS) {
 			ecs.World.Remove(e.Entity())
 
 			object := coll.Objects[0]
+			w.gameCtx.Audio.PlaySound(audio.Hit)
 
 			tag.Cell.Each(ecs.World, func(e *donburi.Entry) {
 				obj := component.CollideBox.Get(e)
@@ -95,6 +110,8 @@ func (w *WeaponController) shoot(ecs *ecs.ECS, weapon *component.WeaponData, sta
 		bullet := factory.NewBullet(ecs, v, start)
 		collision.AddToSpace(w.space, bullet)
 	}
+
+	w.gameCtx.Audio.PlaySound(audio.Shoot)
 
 	weapon.NextShot = time.Now().Add(time.Second)
 }

@@ -24,8 +24,7 @@ type openFn func(path string) io.ReadCloser
 type Storage struct {
 	imageRegistry map[AssetKey]string
 	imageContent  map[AssetKey]*ebiten.Image
-
-	openFn func(path string) io.ReadCloser
+	openFn        func(path string) io.ReadCloser
 }
 
 func NewStorage(openFn openFn) *Storage {
