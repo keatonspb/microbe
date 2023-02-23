@@ -2,7 +2,7 @@ name: Lint
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "master", "10-fix-ci" ]
   pull_request:
     branches: [ "master" ]
 
