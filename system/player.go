@@ -3,6 +3,7 @@ package system
 import (
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/factory"
 	"bacteria/helper"
 	"bacteria/tag"
 
@@ -24,6 +25,7 @@ func (c *PlayerController) Update(ecs *ecs.ECS) {
 	c.updatePlayerDamage(ecs)
 }
 
+// nolint: gocyclo
 func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 	player, ok := tag.Player.First(ecs.World)
 	if !ok {
@@ -31,9 +33,15 @@ func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 		return
 	}
 
+	animator := component.Animate.Get(player)
+	direction := component.Direction.Get(player)
+	object := collision.GetObject(player)
+	if coll := object.Check(0, 0, "mob"); coll != nil {
+		animator.Play(factory.AnimationDamageLeft, false)
+	}
+
 	isMoving := false
-	if ebiten.IsKeyPressed(ebiten.KeyUp) {
-		object := collision.GetObject(player)
+	if ebiten.IsKeyPressed(ebiten.KeyUp) || ebiten.IsKeyPressed(ebiten.KeyW) {
 		if object.Y > 0 {
 			object.Y -= component.GetMove(player, ecs.Time.DeltaTime())
 		}
@@ -41,8 +49,7 @@ func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 		isMoving = true
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyDown) {
-		object := collision.GetObject(player)
+	if ebiten.IsKeyPressed(ebiten.KeyDown) || ebiten.IsKeyPressed(ebiten.KeyS) {
 		if object.Y+object.H < c.gameCtx.ScreenHeight() {
 			object.Y += component.GetMove(player, ecs.Time.DeltaTime())
 		}
@@ -50,26 +57,37 @@ func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 		isMoving = true
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyLeft) {
-		object := collision.GetObject(player)
+	if ebiten.IsKeyPressed(ebiten.KeyLeft) || ebiten.IsKeyPressed(ebiten.KeyA) {
 		if object.X > 0 {
 			object.X -= component.GetMove(player, ecs.Time.DeltaTime())
 		}
 		object.Update()
 		isMoving = true
+		direction.SetLeft()
 	}
 
-	if ebiten.IsKeyPressed(ebiten.KeyRight) {
-		object := collision.GetObject(player)
+	if ebiten.IsKeyPressed(ebiten.KeyRight) || ebiten.IsKeyPressed(ebiten.KeyD) {
 		if object.X+object.W < c.gameCtx.ScreenWidth() {
 			object.X += component.GetMove(player, ecs.Time.DeltaTime())
 		}
 		object.Update()
 		isMoving = true
+		direction.SetRight()
 	}
 
 	if !isMoving {
 		component.SlowSpeed(player, ecs.Time.DeltaTime())
+		if direction.IsLeft() {
+			animator.Play(factory.AnimationIdleLeft, true)
+		} else {
+			animator.Play(factory.AnimationIdleRight, true)
+		}
+	} else {
+		if direction.IsLeft() {
+			animator.Play(factory.AnimationWalkLeft, true)
+		} else {
+			animator.Play(factory.AnimationWalkRight, true)
+		}
 	}
 }
 
@@ -99,13 +117,18 @@ func (c *PlayerController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 func (c *PlayerController) drawPlayer(ecs *ecs.ECS, screen *ebiten.Image) {
 	playerEntry, ok := tag.Player.First(ecs.World)
 	if !ok {
-		logrus.Error("setting not found")
+		logrus.Error("player not found")
 		return
 	}
 
 	object := collision.GetObject(playerEntry)
-	sprite := component.Sprite.Get(playerEntry)
+	ani := component.Animate.Get(playerEntry)
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(object.X, object.Y)
-	screen.DrawImage(sprite.Image, op)
+	img := ani.GetImage(ecs.Time.DeltaTime())
+	if img == nil {
+		logrus.Error("image is nil")
+		return
+	}
+	screen.DrawImage(img, op)
 }

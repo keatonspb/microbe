@@ -6,6 +6,7 @@ import (
 
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper"
 	"bacteria/helper/storage"
 	"bacteria/layer"
 	"bacteria/meta"
@@ -30,11 +31,8 @@ func NewMob(ecs *ecs.ECS, screenWidth float64, mobType int, fs *storage.Storage)
 	if err != nil {
 		log.Fatal(err)
 	}
-	component.Sprite.Set(entry, &component.SpriteData{
-		Height: 5,
-		Width:  5,
-		Image:  img,
-	})
+
+	component.Sprite.Set(entry, helper.NewSprite(img, 5, 5))
 	component.Float.Set(entry, &component.FloatData{
 		Speed: mobDesc.Speed,
 	})

@@ -18,8 +18,8 @@ import (
 var gameAssets embed.FS
 
 const (
-	screenWidth  = 640
-	screenHeight = 480
+	screenWidth  = 1280
+	screenHeight = 720
 )
 
 type Game struct {

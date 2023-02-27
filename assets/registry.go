@@ -11,7 +11,7 @@ const (
 )
 
 var ImagePaths = map[storage.AssetKey]string{
-	ImagePlayer: "assets/player.png",
+	ImagePlayer: "assets/player-v2-sprite.png",
 	ImageMobA:   "assets/ley1.png",
 	ImageMobB:   "assets/ley2.png",
 	ImageMobC:   "assets/ley3.png",
