@@ -1,20 +1,9 @@
 package component
 
 import (
-	"image/color"
+	"bacteria/helper"
 
-	"bacteria/meta"
-
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/yohamta/donburi"
 )
 
-type SpriteData struct {
-	Color  color.Color
-	Height float64
-	Width  float64
-	Shape  meta.Shape
-	Image  *ebiten.Image
-}
-
-var Sprite = donburi.NewComponentType[SpriteData]()
+var Sprite = donburi.NewComponentType[helper.Sprite]()

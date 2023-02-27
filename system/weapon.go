@@ -104,7 +104,7 @@ func (w *WeaponController) shoot(ecs *ecs.ECS, weapon *component.WeaponData, sta
 		return
 	}
 
-	vectors := getVector(weapon.Bullets, 100)
+	vectors := getVector(weapon.Bullets, weapon.Speed)
 
 	for _, v := range vectors {
 		bullet := factory.NewBullet(ecs, v, start)
@@ -155,7 +155,7 @@ func (w *WeaponController) updateBulletMove(ecs *ecs.ECS) {
 
 func (w *WeaponController) Draw(ecs *ecs.ECS, screen *ebiten.Image) {
 	tag.Bullet.Each(ecs.World, func(e *donburi.Entry) {
-		sprite := component.Sprite.Get(e)
+		sprite := component.Shape.Get(e)
 		object := component.CollideBox.Get(e)
 		ebitenutil.DrawRect(screen, object.X, object.Y, sprite.Height, sprite.Width, sprite.Color)
 	})

@@ -20,7 +20,7 @@ func NewBullet(ecs *ecs.ECS, vector meta.Vector, position meta.Point) *donburi.E
 		layer.Default,
 		tag.Bullet,
 		component.CollideBox,
-		component.Sprite,
+		component.Shape,
 		component.Move,
 		component.Velocity,
 	))
@@ -28,14 +28,14 @@ func NewBullet(ecs *ecs.ECS, vector meta.Vector, position meta.Point) *donburi.E
 	collisionObj := resolv.NewObject(position.X, position.Y, 2, 2, "bullet")
 	collision.SetObject(entry, collisionObj)
 
-	component.Sprite.Set(entry, &component.SpriteData{
+	component.Shape.Set(entry, &component.ShapeData{
 		Color: color.RGBA{
 			R: 255,
 			G: 255,
 			B: 255,
 			A: 255,
 		},
-		Shape:  meta.NewShape(position.X, position.Y, 4, 4),
+		Form:   meta.NewShape(position.X, position.Y, 4, 4),
 		Height: 2,
 		Width:  2,
 	})

@@ -6,6 +6,7 @@ import (
 	"bacteria/assets"
 	"bacteria/collision"
 	"bacteria/component"
+	"bacteria/helper"
 	"bacteria/helper/storage"
 	"bacteria/layer"
 	"bacteria/meta"
@@ -45,11 +46,7 @@ func NewCell(ecs *ecs.ECS, position meta.Point, fs *storage.Storage) *donburi.En
 		log.Fatal(err)
 	}
 
-	component.Sprite.Set(entry, &component.SpriteData{
-		Width:  32,
-		Height: 32,
-		Image:  img,
-	})
+	component.Sprite.Set(entry, helper.NewSprite(img, 32, 32))
 
 	collision.SetObject(entry, resolv.NewObject(position.X, position.Y, 30, 30, "cell"))
 

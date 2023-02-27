@@ -111,6 +111,6 @@ func (c *MobController) drawMob(ecs *ecs.ECS, screen *ebiten.Image) {
 		}
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(object.X, object.Y)
-		screen.DrawImage(sprite.Image, op)
+		screen.DrawImage(sprite.GetImage(), op)
 	})
 }
