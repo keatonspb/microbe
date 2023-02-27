@@ -37,7 +37,12 @@ func (c *PlayerController) updatePlayer(ecs *ecs.ECS) {
 	direction := component.Direction.Get(player)
 	object := collision.GetObject(player)
 	if coll := object.Check(0, 0, "mob"); coll != nil {
-		animator.Play(factory.AnimationDamageLeft, false)
+		if direction.IsLeft() {
+			animator.Play(factory.AnimationDamageLeft, false)
+		} else {
+			animator.Play(factory.AnimationDamageRight, false)
+		}
+
 	}
 
 	isMoving := false

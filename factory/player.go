@@ -54,8 +54,8 @@ func NewPlayer(ctx *helper.Context, ecs *ecs.ECS) *donburi.Entry {
 	animator.AddAnimation(AnimationIdleLeft, [][]int{{1, 4}, {1, 3}}, 600*time.Millisecond)
 	animator.AddAnimation(AnimationWalkRight, [][]int{{0, 2}, {0, 3}}, 600*time.Millisecond)
 	animator.AddAnimation(AnimationWalkLeft, [][]int{{1, 1}, {1, 2}}, 600*time.Millisecond)
-	animator.AddAnimation(AnimationDamageLeft, [][]int{{1, 0}, {1, 0}}, 600*time.Millisecond)
-	animator.AddAnimation(AnimationDamageRight, [][]int{{0, 4}, {0, 4}}, 600*time.Millisecond)
+	animator.AddAnimation(AnimationDamageLeft, [][]int{{1, 0}, {1, 0}}, 300*time.Millisecond)
+	animator.AddAnimation(AnimationDamageRight, [][]int{{0, 4}, {0, 4}}, 300*time.Millisecond)
 
 	component.Animate.Set(entry, animator)
 

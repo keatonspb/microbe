@@ -34,15 +34,15 @@ func (a *Animator) AddAnimation(id int, s [][]int, fps time.Duration) {
 	a.animations[id] = seq
 }
 
-func (a *Animator) Play(id int, repeateable bool) {
+func (a *Animator) Play(id int, repeatable bool) {
 	if a.currentAnimation == id {
 		return
 	}
-	if repeateable {
+	if !repeatable {
 		a.oneTimeAnimation = &id
 	}
 
-	a.animations[id].Start(repeateable)
+	a.animations[id].Start(repeatable)
 	a.currentAnimation = id
 }
 
